@@ -66,6 +66,18 @@ const PostSchema = new mongoose.Schema(
         },
       },
     ],
+    reports: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        reason: {
+          type: String,
+          trim: true
+        }
+      }
+    ]
   },
   { timestamps: true },
 );
