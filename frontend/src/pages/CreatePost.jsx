@@ -25,7 +25,7 @@ function CreatePost() {
     e.preventDefault();
 
     try {
-      await api.post("/posts", form);
+      await api.post("/post", form);
       navigate("/feed");
     } catch (err) {
       alert("Failed to create post");
