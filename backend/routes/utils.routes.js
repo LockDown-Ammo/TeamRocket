@@ -19,7 +19,7 @@ function fetchLocations(req, res) {
 function fetchItems(req, res) {
     return res.json({
         success: true,
-        locations: pokemonItems
+        items: pokemonItems
     })
 }
 router.get('/types', fetchTypes)
