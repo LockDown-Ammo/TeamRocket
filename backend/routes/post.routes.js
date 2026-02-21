@@ -4,5 +4,6 @@ const postController = require('../controllers/post.controller')
 const authMiddleware = require('../middleware/auth.middleware')
 
 router.post('/', authMiddleware, postController.createPost)
+router.post('/:id/rate', authMiddleware, postController.ratePost)
 
 module.exports = router
