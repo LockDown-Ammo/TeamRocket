@@ -94,6 +94,16 @@ exports.ratePost = async (req, res) => {
 
     await post.save();
 
+    const avg = post.ratings.reduce((sum, r) => sum + r.value, 0) / post.ratings.length;
+
+    if (avg > 4.5 && post.ratings.length >= 3) {
+      const author = await User.findById(post.author);
+
+      author.isBanned = true;
+      author.banReason = "Spreading Misinformation";
+      await author.save();
+    }
+
     return res.json({ success: true, message: "Post rated" });
   } catch (err) {
     return res.status(500).json({
@@ -111,7 +121,7 @@ exports.reportPost = async (req, res) => {
     const { reason } = req.body;
     const postId = req.params.id;
 
-    if(!reason) 
+    if (!reason)
       return res.status(400).json({
         success: false,
         error: {

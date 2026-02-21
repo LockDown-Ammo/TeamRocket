@@ -1,11 +1,14 @@
 const Post = require('../models/Post')
-const User = require('../models/User')
+const User = require('../models/User');
+const { rankPosts } = require('../utils/feed.algorithm');
 const { alterPostForUser } = require('../utils/misinformationEngine')
 
 exports.getFeed = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
-        const posts = await Post.find().populate("author", "username").sort({ createdAt: -1 })
+        let posts = await Post.find().populate("author", "username").sort({ createdAt: -1 })
+
+        posts = rankPosts(posts);
 
         let altered = posts.map(p => alterPostForUser(p, user))
         if(req.query.access == 'musibat-ke-liye-tayar-ho-jao') altered = posts
