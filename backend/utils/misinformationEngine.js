@@ -1,58 +1,77 @@
-const crypto = require('crypto')
-const { pokemonLocations, pokemonItems } = require('./pokemonData')
+const crypto = require("crypto");
+const { pokemonLocations, pokemonItems } = require("./pokemonData");
+const { getPokemonRarity } = require("../services/pokemon.service");
 
 function hash(key) {
-    return crypto.createHash('sha256').update(key).digest('hex')
+  return crypto.createHash("sha256").update(key).digest("hex");
 }
 
 function hexToFloat(hex) {
-    return parseInt(hex.slice(0, 8), 16) / 0xffffffff
+  return parseInt(hex.slice(0, 8), 16) / 0xffffffff;
 }
 
 function generateFakeLocation(seed) {
-    const idx = parseInt(seed.slice(0, 8), 16) % pokemonLocations.length
-    return pokemonLocations[idx]
+  const idx = parseInt(seed.slice(0, 8), 16) % pokemonLocations.length;
+  return pokemonLocations[idx];
 }
 
 function generateFakeLevel(seed) {
-    return (parseInt(seed.slice(8, 12), 16) % 100) + 1
+  return (parseInt(seed.slice(8, 12), 16) % 100) + 1;
 }
 
 function generateFakeHealth(seed) {
-    return (parseInt(seed.slice(12, 16), 16) % 200) + 20
+  return (parseInt(seed.slice(12, 16), 16) % 200) + 20;
 }
 
 function generateFakeItem(seed) {
-    const idx = parseInt(seed.slice(16, 20), 16) % pokemonItems.length
-    return pokemonItems[idx]
+  const idx = parseInt(seed.slice(16, 20), 16) % pokemonItems.length;
+  return pokemonItems[idx];
 }
 
 exports.alterPostForUser = (post, user) => {
-    const threshold = parseInt(process.env.TRUST_THRESHOLD || 3)
-    if (user.trustLevel < threshold) return post
+  const authorId = post.author._id;
+  if (authorId.toString() === user._id.toString()) {
+    return post;
+  }
 
-    if (user._id == post.author._id) return post
+  const threshold = parseInt(process.env.TRUST_THRESHOLD);
 
-    const seed = hash(user._id.toString() + post._id.toString() + user.misinformationSeed)
+  if (user.trustLevel < threshold) return post;
 
-    const betrayChance = Math.min(0.7, (user.trustLevel - threshold) * 0.15)
+  const baseSeed = hash(
+    user._id.toString() + post._id.toString() + user.misinformationSeed,
+  );
 
-    const decisionValue = hexToFloat(seed)
+  const rarityWeights = {
+    common: 0.3,
+    uncommon: 0.45,
+    rare: 0.65,
+    legendary: 0.85,
+  };
 
-    if (decisionValue > betrayChance) return post
+  const rarity = post.rarity || 'common'
+  const corruptionThreshold = rarityWeights[rarity] || 0.4;
 
-    const altered = { ...post._doc }
+  const eligibility = hexToFloat(baseSeed);
 
-    const fieldSeed = hash(seed + "fields")
-    const fieldValue = hexToFloat(fieldSeed)
+  if (eligibility > corruptionThreshold) {
+    return post;
+  }
 
-    if (fieldValue < 0.8) altered.location = generateFakeLocation(seed)
+  const altered = { ...post._doc };
 
-    if (fieldValue < 0.6) altered.level = generateFakeLevel(seed)
+  const locationSeed = hash(baseSeed + "location");
+  if (hexToFloat(locationSeed) < 0.6)
+    altered.location = generateFakeLocation(baseSeed);
 
-    if (fieldValue < 0.4) altered.health = generateFakeHealth(seed)
+  const levelSeed = hash(baseSeed + "level");
+  if (hexToFloat(levelSeed) < 0.5) altered.level = generateFakeLevel(baseSeed);
 
-    if (fieldValue < 0.3) altered.heldItem = generateFakeItem(seed)
+  const healthSeed = hash(baseSeed + "health");
+  if (hexToFloat(healthSeed) < 0.4)
+    altered.health = generateFakeHealth(baseSeed);
 
-    return altered
-}
+  const itemSeed = hash(baseSeed + "heldItem");
+  if (hexToFloat(itemSeed) < 0.3) altered.heldItem = generateFakeItem(baseSeed);
+  return altered;
+};
