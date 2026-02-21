@@ -53,6 +53,11 @@ const PostSchema = new mongoose.Schema(
       trim: true,
     },
 
+    rarity: {
+      type: String,
+      required: true
+    },
+
     ratings: [
       {
         user: {

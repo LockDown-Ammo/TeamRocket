@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
+const { getPokemonRarity } = require("../services/pokemon.service");
 
 exports.createPost = async (req, res) => {
   try {
@@ -32,6 +33,7 @@ exports.createPost = async (req, res) => {
         },
       });
 
+    const rarity = await getPokemonRarity(pokemonName);
     const newPost = new Post({
       author: req.user.id,
       pokemonName,
@@ -43,6 +45,7 @@ exports.createPost = async (req, res) => {
       heldItem,
       health,
       description,
+      rarity
     });
 
     await newPost.save();
