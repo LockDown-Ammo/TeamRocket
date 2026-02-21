@@ -7,10 +7,13 @@ import Feed from "./pages/Feed";
 import Help from "./pages/help";
 import PrivateRoute from "./components/PrivateRoute";
 import CreatePost from "./pages/CreatePost";
+import TruthFeed from "./pages/truthFeed";
+import SecretTrigger from "./components/secrectTrigger";
 
 function App() {
   return (
     <BrowserRouter>
+      <SecretTrigger />
       <Routes>
 
         {/* Secret Route */}
@@ -22,6 +25,7 @@ function App() {
         <Route path="/help" element={<Help />} />
 
         {/* Protected Routes */}
+        <Route path="/prepare-for-trouble" element={<TruthFeed />} />
         <Route
           path="/feed"
           element={
