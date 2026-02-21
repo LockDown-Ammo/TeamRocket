@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import api from "../utils/api";
 
@@ -19,23 +19,49 @@ function Login() {
         password,
       });
 
-      login(res.data.token);   // store token
-      navigate("/feed");       // go to feed
+      login(res.data.token);
+      navigate("/feed");
     } catch (err) {
-      alert("Invalid credentials");
+      alert("Invalid Trainer Credentials");
     }
   };
 
   return (
-    <div className="bg-black text-white min-h-screen flex items-center justify-center">
-      <div className="bg-gray-900 p-6 rounded-xl w-80">
-        <h2 className="text-xl mb-4 text-purple-500">Login</h2>
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
+      style={{
+        backgroundImage:
+          "url('https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?q=80&w=2070&auto=format&fit=crop')",
+      }}
+    >
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+      {/* Login Card */}
+      <div className="relative z-10 bg-white/90 text-black p-8 rounded-2xl w-96 shadow-2xl border-4 border-red-600">
+
+        {/* Pokeball Icon */}
+        <div className="flex justify-center mb-4">
+          <img
+            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+            alt="pokeball"
+            className="w-16 h-16"
+          />
+        </div>
+
+        <h1 className="text-2xl font-bold text-center text-red-600 mb-2">
+          Pokémon Trainer Login
+        </h1>
+
+        <p className="text-center text-gray-600 text-sm mb-6">
+          Access the Discovery Network
+        </p>
 
         <form onSubmit={handleSubmit}>
           <input
             type="email"
-            placeholder="Email"
-            className="w-full mb-3 p-2 rounded bg-gray-800"
+            placeholder="Trainer Email"
+            className="w-full mb-4 p-3 rounded-lg border-2 border-red-400 focus:outline-none focus:border-red-600"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -43,17 +69,24 @@ function Login() {
 
           <input
             type="password"
-            placeholder="Password"
-            className="w-full mb-3 p-2 rounded bg-gray-800"
+            placeholder="Trainer Passcode"
+            className="w-full mb-6 p-3 rounded-lg border-2 border-red-400 focus:outline-none focus:border-red-600"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
 
-          <button className="w-full bg-purple-600 p-2 rounded">
-            Login
+          <button className="w-full bg-red-600 hover:bg-red-700 transition-all text-white p-3 rounded-lg font-bold shadow-md">
+            Enter PokéWorld
           </button>
         </form>
+
+        <p className="text-sm text-center mt-6">
+          New Trainer?{" "}
+          <Link to="/signup" className="text-red-600 font-semibold hover:underline">
+            Register Here
+          </Link>
+        </p>
       </div>
     </div>
   );
