@@ -1,22 +1,32 @@
 import { useState } from "react";
 
 function Help() {
-  const images = [
-     "/image1.jpg",
-    "/image2.jpg",
-    "/image3.jpg",
-    "/image4.jpg"
+
+  const challenges = [
+    {
+      image: "/image1.jpg",
+      correctBoxes: [0, 1, 3, 4]
+    },
+    {
+      image: "/image2.jpg",
+      correctBoxes: [0 , 1 , 3 , 4 , 5]
+    },
+    {
+      image: "/image3.jpg",
+      correctBoxes: [1, 4, 5]
+    },
+    {
+      image: "/image4.jpg",
+      correctBoxes: [3 , 4 , 7]
+    },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState([]);
+  const [message, setMessage] = useState("");
   const [attempts, setAttempts] = useState(0);
 
-  const currentImage = images[currentIndex];
-
-  const nextImage = () => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  };
+  const currentChallenge = challenges[currentIndex];
 
   const handleClick = (index) => {
     if (selected.includes(index)) return;
@@ -24,23 +34,38 @@ function Help() {
     const updated = [...selected, index];
     setSelected(updated);
 
-    if (updated.length === 5) {
-      setAttempts((prev) => prev + 1);
+    // When user selected enough boxes
+    if (updated.length === currentChallenge.correctBoxes.length) {
+
+      const isCorrect =
+        updated.length === currentChallenge.correctBoxes.length &&
+        updated.every(box =>
+          currentChallenge.correctBoxes.includes(box)
+        );
+
+      if (isCorrect) {
+        setMessage("✔ Correct! Loading next verification...");
+      } else {
+        setMessage("✖ Incorrect selection. Loading new challenge...");
+      }
+
+      setAttempts(prev => prev + 1);
 
       setTimeout(() => {
         setSelected([]);
-        nextImage();
+        setMessage("");
+        setCurrentIndex((prev) => (prev + 1) % challenges.length);
       }, 1500);
     }
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden text-white">
+    <div className="relative min-h-screen flex items-center justify-center text-white overflow-hidden">
 
       {/* Blurred Background */}
       <div
-        className="absolute inset-0 bg-cover bg-center blur-lg scale-110"
-        style={{ backgroundImage: `url(${currentImage})` }}
+        className="absolute inset-0 bg-cover bg-center blur-xl scale-110"
+        style={{ backgroundImage: `url(${currentChallenge.image})` }}
       />
       <div className="absolute inset-0 bg-black/60" />
 
@@ -54,6 +79,7 @@ function Help() {
           Select all boxes that contain Pokémon parts.
         </p>
 
+        {/* 3x3 Grid */}
         <div className="grid grid-cols-3 gap-2 w-72 mx-auto">
           {Array.from({ length: 9 }).map((_, index) => (
             <div
@@ -62,21 +88,24 @@ function Help() {
               className={`w-24 h-24 border cursor-pointer transition
                 ${
                   selected.includes(index)
-                    ? "border-red-400 scale-95"
+                    ? "border-green-400 scale-95"
                     : "border-gray-700 hover:border-red-400"
                 }`}
               style={{
-                backgroundImage: `url(${currentImage})`,
+                backgroundImage: `url(${currentChallenge.image})`,
                 backgroundSize: "300% 300%",
                 backgroundPosition: `
                   ${(index % 3) * 50}% ${(Math.floor(index / 3)) * 50}%
-                `
+                `,
+                backgroundRepeat: "no-repeat"
               }}
             />
           ))}
         </div>
 
-        <p className="text-center mt-4 text-sm">
+        <p className="text-center mt-6 text-yellow-400">{message}</p>
+
+        <p className="text-center mt-2 text-sm">
           Attempts: {attempts}
         </p>
 

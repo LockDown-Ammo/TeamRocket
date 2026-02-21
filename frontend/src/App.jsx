@@ -1,13 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
-import TruthFeed from "./pages/truthfeed";
+import TruthFeed from "./pages/truthFeed";
 import Signup from "./pages/Signup";
 import Feed from "./pages/Feed";
 import Help from "./pages/help";
 import PrivateRoute from "./components/PrivateRoute";
 import CreatePost from "./pages/CreatePost";
-import TruthFeed from "./pages/truthFeed";
 import SecretTrigger from "./components/secrectTrigger";
 
 function App() {
@@ -25,7 +24,6 @@ function App() {
         <Route path="/help" element={<Help />} />
 
         {/* Protected Routes */}
-        <Route path="/prepare-for-trouble" element={<TruthFeed />} />
         <Route
           path="/feed"
           element={
