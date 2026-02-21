@@ -43,10 +43,10 @@ exports.alterPostForUser = (post, user) => {
   );
 
   const rarityWeights = {
-    common: 0.3,
-    uncommon: 0.45,
-    rare: 0.65,
-    legendary: 0.85,
+    common: 0.5,
+    uncommon: 0.75,
+    rare: 0.85,
+    legendary: 0.95,
   };
 
   const rarity = post.rarity || 'common'
