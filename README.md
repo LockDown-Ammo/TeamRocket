@@ -11,7 +11,7 @@ cd Frontend && npm run dev
 ```
 and
 ```bash
-cd backend node server.js
+cd backend && node server.js
 ```
 in 2 seperate terminals
 Website will be online on http://localhost:5173
@@ -78,7 +78,7 @@ Different users see different manipulated data.
 ---
 
 ## Team Rocket Secret Portal
-
+Type isbaarhumfailnahihonge in feed to access Team Rocket's Portal
 ### Portal Access
 ![Secret Portal](screenshots/SecretTruthColapsed.png)
 
