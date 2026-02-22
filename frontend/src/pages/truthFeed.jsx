@@ -8,7 +8,7 @@ function TruthFeed() {
     const fetchTruth = async () => {
       try {
         const res = await api.get("/feed?access=musibat-ke-liye-tayar-ho-jao");
-        setPosts(res.data);
+        setPosts(res.data.posts);
       } catch (err) {
         alert("Truth access failed");
       }
