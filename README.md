@@ -1,11 +1,22 @@
-# 🚀 Noobathon 2026  
-## 🧨 Team Rocket's Evil Masterplan
+# Noobathon 2026  
+## Team Rocket's Evil Masterplan
 
 A Pokémon-themed misinformation platform built for Noobathon Hackathon 2026.
 
 ---
-
-## 🔐 Authentication
+## Steps to Run
+Clone the repository then run
+```bash
+cd Frontend && npm run dev
+```
+and
+```bash
+cd backend node server.js
+```
+in 2 seperate terminals
+Website will be online on http://localhost:5173
+---
+## Authentication
 
 ### Login Page
 ![Login Page](screenshots/Login.png)
@@ -15,13 +26,13 @@ A Pokémon-themed misinformation platform built for Noobathon Hackathon 2026.
 
 ---
 
-## ➕ Create Post
+## Create Post
 
 ![Create Post](screenshots/CreatePost.png)
 
 ---
 
-## 📡 Feed Page
+## Feed Page
 
 ### Expanded View
 ![Feed Expanded](screenshots/FeedExpanded.png)
@@ -31,7 +42,7 @@ A Pokémon-themed misinformation platform built for Noobathon Hackathon 2026.
 
 ---
 
-## ❓ Help System (Team Rocket Edition)
+## Help System (Team Rocket Edition)
 
 ### Help Query Page
 ![Help Page](screenshots/HelpQuery.png)
@@ -44,7 +55,7 @@ A Pokémon-themed misinformation platform built for Noobathon Hackathon 2026.
 
 ---
 
-## ⚠ Reporting System
+## Reporting System
 
 ### Before Reporting
 ![Before Reporting](screenshots/BeforeReporting.png)
@@ -54,7 +65,7 @@ A Pokémon-themed misinformation platform built for Noobathon Hackathon 2026.
 
 ---
 
-## 🎭 Personalized Misinformation
+## Personalized Misinformation
 
 Different users see different manipulated data.
 
@@ -66,7 +77,7 @@ Different users see different manipulated data.
 
 ---
 
-## 🕵️ Team Rocket Secret Portal
+## Team Rocket Secret Portal
 
 ### Portal Access
 ![Secret Portal](screenshots/SecretTruthColapsed.png)
