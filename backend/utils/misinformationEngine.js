@@ -1,6 +1,5 @@
 const crypto = require("crypto");
 const { pokemonLocations, pokemonItems } = require("./pokemonData");
-const { getPokemonRarity } = require("../services/pokemon.service");
 
 function hash(key) {
   return crypto.createHash("sha256").update(key).digest("hex");
@@ -75,3 +74,5 @@ exports.alterPostForUser = (post, user) => {
   if (hexToFloat(itemSeed) < 0.3) altered.heldItem = generateFakeItem(baseSeed);
   return altered;
 };
+
+exports.hash = hash

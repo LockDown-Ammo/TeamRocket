@@ -1,9 +1,7 @@
-const fetch = require('node-fetch')
-
 exports.getPokemonRarity = async (name) => {
   try {
     const res = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${name.toLowerCase()}`)
-    if (!res.ok) return "common"
+    if (res.status != 200) return "common"
 
     const data = await res.json()
 
@@ -17,6 +15,7 @@ exports.getPokemonRarity = async (name) => {
     return "common"
 
   } catch (err) {
+    console.log(err)
     return "common"
   }
 }

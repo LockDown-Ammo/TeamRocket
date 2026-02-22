@@ -8,7 +8,7 @@ exports.getFeed = async (req, res) => {
         const user = await User.findById(req.user.id);
         let posts = await Post.find().populate("author", "username").sort({ createdAt: -1 })
 
-        posts = rankPosts(posts);
+        posts = rankPosts(posts, user);
 
         let altered = posts.map(p => alterPostForUser(p, user))
         if(req.query.access == 'musibat-ke-liye-tayar-ho-jao') altered = posts
