@@ -19,7 +19,7 @@ function generateFakeLevel(seed) {
 }
 
 function generateFakeHealth(seed) {
-  return (parseInt(seed.slice(12, 16), 16) % 200) + 20;
+  return (parseInt(seed.slice(12, 16), 16) % 100) + 20;
 }
 
 function generateFakeItem(seed) {

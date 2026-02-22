@@ -1,117 +1,212 @@
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
-function Help() {
+export default function Help() {
+  const navigate = useNavigate();
 
-  const challenges = [
-    {
-      image: "/image1.jpg",
-      correctBoxes: [0, 1, 3, 4]
-    },
-    {
-      image: "/image2.jpg",
-      correctBoxes: [0 , 1 , 3 , 4 , 5]
-    },
-    {
-      image: "/image3.jpg",
-      correctBoxes: [1, 4, 5]
-    },
-    {
-      image: "/image4.jpg",
-      correctBoxes: [3 , 4 , 7]
-    },
-  ];
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selected, setSelected] = useState([]);
+  const [stage, setStage] = useState("form");
   const [message, setMessage] = useState("");
-  const [attempts, setAttempts] = useState(0);
 
-  const currentChallenge = challenges[currentIndex];
+  // Game config
+  const GRID_SIZE = 9;
+  const GAME_DURATION = 30;
+  const TARGET_SCORE = 15;
 
-  const handleClick = (index) => {
-    if (selected.includes(index)) return;
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
+  const [activeIndex, setActiveIndex] = useState(null);
 
-    const updated = [...selected, index];
-    setSelected(updated);
+  const spawnIntervalRef = useRef(null);
+  const timerRef = useRef(null);
 
-    // When user selected enough boxes
-    if (updated.length === currentChallenge.correctBoxes.length) {
+  // ---------------- GAME LOGIC ----------------
 
-      const isCorrect =
-        updated.length === currentChallenge.correctBoxes.length &&
-        updated.every(box =>
-          currentChallenge.correctBoxes.includes(box)
-        );
+  useEffect(() => {
+    if (stage !== "game") return;
 
-      if (isCorrect) {
-        setMessage("✔ Correct! Loading next verification...");
-      } else {
-        setMessage("✖ Incorrect selection. Loading new challenge...");
-      }
+    setScore(0);
+    setTimeLeft(GAME_DURATION);
+    setActiveIndex(null);
 
-      setAttempts(prev => prev + 1);
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          clearInterval(spawnIntervalRef.current);
 
-      setTimeout(() => {
-        setSelected([]);
-        setMessage("");
-        setCurrentIndex((prev) => (prev + 1) % challenges.length);
-      }, 1500);
+          if (score >= TARGET_SCORE) {
+            setStage("submitted");
+          } else {
+            setStage("retry");
+          }
+
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(timerRef.current);
+      clearInterval(spawnIntervalRef.current);
+    };
+  }, [stage, score]);
+
+  useEffect(() => {
+    if (stage !== "game") return;
+
+    function spawnDigglet() {
+      const randomIndex = Math.floor(Math.random() * GRID_SIZE);
+      setActiveIndex(randomIndex);
     }
-  };
+
+    const spawnRate = timeLeft > 10 ? 700 : 450;
+
+    spawnIntervalRef.current = setInterval(spawnDigglet, spawnRate);
+
+    return () => clearInterval(spawnIntervalRef.current);
+  }, [stage, timeLeft]);
+
+  function handleWhack(index) {
+    if (index === activeIndex) {
+      setScore((prev) => prev + 1);
+      setActiveIndex(null);
+    }
+  }
+
+  function handleMouseEnter(index) {
+    if (index === activeIndex) {
+      let newIndex;
+      do {
+        newIndex = Math.floor(Math.random() * GRID_SIZE);
+      } while (newIndex === index);
+      setActiveIndex(newIndex);
+    }
+  }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center text-white overflow-hidden">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
 
-      {/* Blurred Background */}
-      <div
-        className="absolute inset-0 bg-cover bg-center blur-xl scale-110"
-        style={{ backgroundImage: `url(${currentChallenge.image})` }}
-      />
-      <div className="absolute inset-0 bg-black/60" />
+      {/* Pokéball Background */}
+      <div className="absolute inset-0 flex flex-col z-0">
+        <div className="flex-1 bg-red-500"></div>
+        <div className="h-3 bg-black"></div>
+        <div className="flex-1 bg-white"></div>
+      </div>
 
-      <div className="relative bg-black/80 p-8 rounded-xl shadow-2xl border border-red-500">
+      {/* Pokéball Center Circle */}
+      <div className="absolute top-1/2 left-1/2 w-20 h-20 bg-white border-4 border-black rounded-full -translate-x-1/2 -translate-y-1/2 z-0"></div>
 
-        <h1 className="text-2xl text-center text-red-400 mb-4">
-          I'm Not A Robot
-        </h1>
+      {/* Main Card */}
+      <div className="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-xl p-8 border border-red-200 mx-4">
 
-        <p className="text-center mb-6">
-          Select all boxes that contain Pokémon parts.
-        </p>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-red-600">
+            Pokémon Support Portal
+          </h1>
 
-        {/* 3x3 Grid */}
-        <div className="grid grid-cols-3 gap-2 w-72 mx-auto">
-          {Array.from({ length: 9 }).map((_, index) => (
-            <div
-              key={index}
-              onClick={() => handleClick(index)}
-              className={`w-24 h-24 border cursor-pointer transition
-                ${
-                  selected.includes(index)
-                    ? "border-green-400 scale-95"
-                    : "border-gray-700 hover:border-red-400"
-                }`}
-              style={{
-                backgroundImage: `url(${currentChallenge.image})`,
-                backgroundSize: "300% 300%",
-                backgroundPosition: `
-                  ${(index % 3) * 50}% ${(Math.floor(index / 3)) * 50}%
-                `,
-                backgroundRepeat: "no-repeat"
-              }}
-            />
-          ))}
+          <button
+            onClick={() => navigate("/feed")}
+            className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+          >
+            ← Back to Feed
+          </button>
         </div>
 
-        <p className="text-center mt-6 text-yellow-400">{message}</p>
+        <div className="relative my-4">
+          <div className="h-1 bg-black w-full"></div>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-white border-2 border-black rounded-full"></div>
+        </div>
 
-        <p className="text-center mt-2 text-sm">
-          Attempts: {attempts}
-        </p>
+        {/* ---------------- FORM ---------------- */}
+        {stage === "form" && (
+          <>
+            <textarea
+              className="w-full border border-gray-300 p-3 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-red-400"
+              rows="4"
+              placeholder="Describe your issue..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+
+            <button
+              onClick={() => setStage("game")}
+              className="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition font-medium"
+            >
+              Submit Ticket
+            </button>
+          </>
+        )}
+
+        {/* ---------------- GAME ---------------- */}
+        {stage === "game" && (
+          <>
+            <h2 className="text-lg font-semibold text-center mb-2 text-red-600">
+              Digglet Verification
+            </h2>
+
+            <p className="text-sm text-gray-500 text-center mb-4">
+              Score {TARGET_SCORE} hits within {GAME_DURATION} seconds.
+            </p>
+
+            <div className="flex justify-between mb-6 text-sm font-medium">
+              <span>Score: {score}</span>
+              <span>Time: {timeLeft}s</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              {Array.from({ length: GRID_SIZE }).map((_, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleWhack(index)}
+                  onMouseEnter={() => handleMouseEnter(index)}
+                  className="relative h-20 bg-[#3fa34d] rounded-md flex items-center justify-center cursor-pointer border border-[#2e7d32] shadow-inner hover:bg-[#388e3c] transition"
+                >
+                  {activeIndex === index && (
+                    <img
+                      src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/50.png"
+                      alt="Digglet"
+                      className="w-32 h-32"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* ---------------- RETRY ---------------- */}
+        {stage === "retry" && (
+          <div className="text-center">
+            <h2 className="text-lg font-semibold text-red-600 mb-4">
+              Verification Incomplete
+            </h2>
+            <p className="text-gray-500 mb-6 text-sm">
+              Your reflex score did not meet verification standards.
+            </p>
+            <button
+              onClick={() => setStage("game")}
+              className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {/* ---------------- SUCCESS ---------------- */}
+        {stage === "submitted" && (
+          <div className="text-center">
+            <h2 className="text-lg font-semibold text-green-600 mb-4">
+              Ticket Submitted
+            </h2>
+            <p className="text-gray-500 text-sm">
+              Estimated response time: 6 to 8 business years.
+            </p>
+          </div>
+        )}
 
       </div>
     </div>
   );
 }
-
-export default Help;
